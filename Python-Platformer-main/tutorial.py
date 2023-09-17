@@ -95,7 +95,13 @@ class Player(pygame.sprite.Sprite): #pixel-perfec collision made easier with spr
         sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites) 
         self.sprite = sprites[sprite_index]
         self.animation_count += 1
+        self.update()
 
+    def update(self): #update the rectangle that bounds our character based on the sprite that is showing, keeps rectangle collision from happening
+        #line above needed to be def update(self) to work... on tutorial he used just def update()
+        self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y)) 
+        #in line above he used topLeft... I needed to use topleft
+        self.mask = pygame.mask.from_surface(self.sprite)
 
     def draw(self, win): #this function draws the sprite, not animate
         win.blit(self.sprite, (self.rect.x, self.rect.y))
