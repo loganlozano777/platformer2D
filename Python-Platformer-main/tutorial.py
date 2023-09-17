@@ -71,7 +71,15 @@ class Player(pygame.sprite.Sprite): #pixel-perfec collision made easier with spr
         self.direction = "left"
         self.animation_count = 0
         self.fall_count = 0
-    
+        self.jump_count = 0
+
+    def jump(self):
+        self.y_vel = -self.GRAVITY * 8 #negative to jump up because y_vel will change
+        self.animation_count = 0 
+        self.jump_count += 1
+        if self.jump_count == 1:
+            self.fall_count = 0
+
     def move(self, dx, dy):
         self.rect.x += dx
         self.rect.y += dy 
@@ -106,7 +114,14 @@ class Player(pygame.sprite.Sprite): #pixel-perfec collision made easier with spr
 
     def update_sprite(self): #this is dynamic and should work for any sprite, trying to pick a new index every animation frame from our sprites
         sprite_sheet = "idle"
-        if self.x_vel != 0:
+        if self.y_vel < 0:
+            if self.jump_count == 1:
+                sprite_sheet = "jump"
+            elif self.jump_count == 2:
+                sprite_sheet = "double_jump"
+        elif self.y_vel > self.GRAVITY * 2:
+            sprite_sheet = "fall"
+        elif self.x_vel != 0:
             sprite_sheet = "run"
 
         sprite_sheet_name = sprite_sheet + "_" + self.direction
@@ -227,6 +242,10 @@ def main(window):
                 run = False
                 break
         
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and player.jump_count < 2:
+                    player.jump()
+
         player.loop(FPS)
         handle_move(player, floor)
         draw(window, background, bg_image, player, floor)
